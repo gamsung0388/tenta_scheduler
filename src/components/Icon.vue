@@ -1,0 +1,8 @@
+<script setup>
+import { computed } from 'vue'
+import { CalendarDays, LayoutTemplate, ImagePlus, Type, Layers, Undo2, Redo2, Download, ChevronDown, ChevronLeft, ChevronRight, Plus, X, Check, CheckCheck, LoaderCircle, AlertCircle, ZoomIn, ZoomOut, Maximize, MousePointer2, LockKeyhole, LockKeyholeOpen, Eye, EyeOff, ArrowUp, ArrowDown, Trash2, FolderOpen, Archive, Upload, Settings2, Sparkles, Info, CircleHelp, ArrowUpRight, PanelRightClose, RotateCcw, Bold, AlignLeft, AlignCenter, AlignRight, Copy, BookOpen, FilePlus2, Move, Grip, CheckCircle2 } from 'lucide-vue-next'
+const props = defineProps({ name: String, size: { default: 18 } })
+const icons = { calendar: CalendarDays, template: LayoutTemplate, image: ImagePlus, text: Type, layers: Layers, undo: Undo2, redo: Redo2, download: Download, down: ChevronDown, left: ChevronLeft, right: ChevronRight, plus: Plus, close: X, check: Check, saved: CheckCheck, loading: LoaderCircle, alert: AlertCircle, zoomIn: ZoomIn, zoomOut: ZoomOut, fit: Maximize, pointer: MousePointer2, lock: LockKeyhole, unlock: LockKeyholeOpen, eye: Eye, hidden: EyeOff, up: ArrowUp, lower: ArrowDown, trash: Trash2, folder: FolderOpen, archive: Archive, upload: Upload, settings: Settings2, sparkle: Sparkles, info: Info, help: CircleHelp, external: ArrowUpRight, panel: PanelRightClose, reset: RotateCcw, bold: Bold, alignLeft: AlignLeft, alignCenter: AlignCenter, alignRight: AlignRight, copy: Copy, book: BookOpen, new: FilePlus2, move: Move, grip: Grip, success: CheckCircle2 }
+const component = computed(() => icons[props.name] || Info)
+</script>
+<template><component :is="component" :size="size" :stroke-width="1.65" aria-hidden="true" /></template>

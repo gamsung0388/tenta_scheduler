@@ -1,0 +1,27 @@
+{
+  "name": "sihyeon-studio",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "playwright test"
+  },
+  "dependencies": {
+    "vue": "^3.5.22",
+    "pinia": "^3.0.3",
+    "konva": "^10.0.0",
+    "vue-konva": "^3.2.5",
+    "dexie": "^4.2.0",
+    "jszip": "^3.10.1",
+    "lucide-vue-next": "^0.468.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vite": "^7.1.7",
+    "@playwright/test": "^1.56.0"
+  }
+}
