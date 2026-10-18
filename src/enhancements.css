@@ -35,4 +35,30 @@
 .preflight-ok { display: flex; align-items: center; gap: 10px; padding: 15px 0; color: #c0c9b8; font-size: 12px; }
 .crop-control { margin-top: 16px; }
 .crop-control input[type=range] { padding: 0; height: 4px; accent-color: #bd7898; }
+.rail-backup-actions { display: grid; gap: 4px; justify-items: center; }
+.rail-guide-button { width: 54px; min-height: 44px; flex-direction: column; gap: 5px; border-radius: 8px; color: #b9a4ba; font-size: 9px; }
+.help-backup-guide { margin-top: 12px; }
+.backup-guide-modal { width: min(760px, calc(100vw - 50px)); }
+.backup-guide-content h2 { margin-top: 9px; }
+.backup-guide-intro { color: #c6b4ca; font-size: 12px; line-height: 1.8; }
+.backup-guide-storage { display: flex; gap: 11px; padding: 15px; margin: 21px 0; border: 1px solid #b8759438; background: #802d4b20; border-radius: 9px; }
+.backup-guide-storage > svg { color: #d79bb7; flex-shrink: 0; margin-top: 2px; }
+.backup-guide-storage p { color: #bba6c2; font-size: 11px; line-height: 1.85; }
+.backup-guide-storage strong { color: #efd4e0; }
+.backup-guide-steps { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.backup-guide-card { display: flex; flex-direction: column; padding: 18px; border-radius: 10px; background: #19192380; border: 1px solid var(--border); min-width: 0; }
+.backup-guide-card h3 { display: flex; align-items: center; gap: 9px; color: #f0dce8; font-size: 13px; }
+.backup-guide-card h3 svg { color: #c58fa9; }
+.backup-guide-card ol { padding-left: 18px; margin: 17px 0 20px; color: #b8a6c1; font-size: 11px; line-height: 1.9; }
+.backup-guide-card li { padding-left: 3px; margin-bottom: 10px; overflow-wrap: anywhere; }
+.backup-guide-card li:last-child { margin-bottom: 0; }
+.backup-guide-card li::marker { color: #cf92b1; }
+.backup-guide-card strong { color: #e5cedd; font-weight: 500; }
+.backup-guide-card > button { width: 100%; margin-top: auto; font-size: 11px; }
+.backup-guide-filetypes { display: grid; gap: 9px; margin-top: 19px; padding: 15px 0 0; border-top: 1px solid var(--border); }
+.backup-guide-filetypes p { display: flex; gap: 11px; font-size: 10px; line-height: 1.8; }
+.backup-guide-filetypes strong { width: 57px; flex-shrink: 0; color: #cfb3c6; }
+.backup-guide-filetypes span { color: #a28da9; }
+.backup-guide-close { width: 100%; margin-top: 19px; }
+@media (max-width: 700px) { .backup-guide-steps { grid-template-columns: 1fr; } }
 @media(max-width:1400px) { .canvas-subbar > span { max-width: 245px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .canvas-options button { font-size: 8px; padding: 5px; } }

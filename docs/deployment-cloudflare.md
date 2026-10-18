@@ -1,6 +1,8 @@
 # SIHYEON STUDIO — Cloudflare 배포 가이드
 
-확인일: 2026-10-19 (KST). 현재 앱은 Vue 3 + Vite 정적 웹앱이며, 이 가이드는 GitHub와 연결한 **Cloudflare Pages** 배포 기준입니다. Cloudflare 계정에서 실제 배포를 실행하기 전 단계까지 준비했습니다.
+확인일: 2026-10-19 (KST). 현재 앱은 Vue 3 + Vite 정적 웹앱입니다. 현재 운영 주소는 [Workers Static Assets 배포본](https://tenta-scheduler.ryan9320.workers.dev)이며, 아래 Pages 절차는 다른 배포 방식을 선택할 때의 안내입니다.
+
+현재 Workers Git 연결 설정은 build=`npm run build`, deploy=`npx wrangler deploy --assets ./dist --name tenta-scheduler --compatibility-date 2026-10-19`, Root directory=저장소 루트, production branch=`main`입니다. 배포 후 기존 작업을 옮기는 상세 절차는 [백업·복원 가이드](backup-restore.md)를 참고하세요.
 
 ## 1. 준비된 저장소
 
