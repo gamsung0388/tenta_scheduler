@@ -1,5 +1,5 @@
 import Konva from 'konva'
-import { WIDTH, HEIGHT, THEMES, DAYS, shortDate, addDays, scheduleLayout, createProject, changeTemplate, elementBounds, isOvernight } from './model'
+import { WIDTH, HEIGHT, THEMES, DAYS, shortDate, addDays, scheduleLayout, createProject, changeTemplate, elementBounds, isOvernight, FONT_FAMILIES } from './model'
 import { assetCache, originalImages } from './assets'
 const sceneStates = new WeakMap(), measurements = new Map()
 const stats = { backgrounds: 0, decorations: 0, elements: 0, scheduleRows: 0, measurements: 0, draws: 0, totalMs: 0 }
@@ -71,6 +71,7 @@ function backdrop(bg, decor, project) {
 function updateSchedule(group, element, project) {
   const t = THEMES[project.design.templateId]
   const settings = project.design.scheduleSettings || {}
+  const fontFamily = FONT_FAMILIES.includes(settings.fontFamily) ? settings.fontFamily : null
   group.setAttrs({ x: element.x, y: element.y, width: 1280, height: 630, scaleX: element.width/1280, scaleY: element.height/630, rotation: element.rotation })
   group._studioRows ||= new Map()
   const issues = []
@@ -81,21 +82,22 @@ function updateSchedule(group, element, project) {
     saved?.node.destroy(); stats.scheduleRows++
     const g = new Konva.Group({ y: row.y }), rowIssues = []
     group.add(g); group._studioRows.set(row.index,{ key,node:g,issues:rowIssues })
+    const rowText = (value, config) => text(g, value, { ...config, fontFamily: fontFamily || config.fontFamily || 'Malgun Gothic' })
     const add = (value,box,style,kind,eventIndex) => {
-      const node = fitText(g,value,box,style)
+      const node = fitText(g,value,box,{ ...style, fontFamily: fontFamily || 'Malgun Gothic' })
       node.setAttr('fitRole',kind)
       if (node.getAttr('fitOverflow')) rowIssues.push({ elementId: element.id, dayIndex: row.index, severity: settings.allowSummary ? 'warning' : 'error', kind:'overflow', message:`${shortDate(row.date)} 일정 ${eventIndex+1} ${kind}: 공간이 부족합니다. 내용을 줄이거나 설명·열 설정을 변경해 주세요.` })
       return node
     }
     rect(g, { width: row.width, height: row.height, fill: t.paper, cornerRadius: 3 })
     rect(g, { width: 4, height: row.height, fill: row.events.length ? t.accent : t.line })
-    text(g, DAYS[row.index], { x: 26, y: (row.height - 29) / 2, fontSize: 29, fill: t.ink })
-    text(g, shortDate(row.date), { x: 80, y: row.height / 2 - 23, fontFamily: 'Georgia', fontSize: 24, fill: t.ink })
-    text(g, ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'][row.index], { x: 82, y: row.height / 2 + 8, fontSize: 12, fill: t.muted, letterSpacing: 2 })
+    rowText(DAYS[row.index], { x: 26, y: (row.height - 29) / 2, fontSize: 29, fill: t.ink })
+    rowText(shortDate(row.date), { x: 80, y: row.height / 2 - 23, fontFamily: 'Georgia', fontSize: 24, fill: t.ink })
+    rowText(['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'][row.index], { x: 82, y: row.height / 2 + 8, fontSize: 12, fill: t.muted, letterSpacing: 2 })
     line(g, [166, 17, 166, row.height - 17], t.line)
     if (!row.events.length) {
-      text(g, '일정 미정', { x: 194, y: (row.height - 24) / 2, fontSize: 24, fill: t.muted })
-      text(g, 'TO BE ANNOUNCED', { x: 907, y: (row.height - 12) / 2, width: 337, align: 'right', fontSize: 12, letterSpacing: 3, fill: t.muted, opacity: .65 })
+      rowText('일정 미정', { x: 194, y: (row.height - 24) / 2, fontSize: 24, fill: t.muted })
+      rowText('TO BE ANNOUNCED', { x: 907, y: (row.height - 12) / 2, width: 337, align: 'right', fontSize: 12, letterSpacing: 3, fill: t.muted, opacity: .65 })
     }
     row.events.forEach((event, i) => {
       const cellHeight = row.height / row.eventRows, offsetY = Math.floor(i / row.columns) * cellHeight
@@ -199,7 +201,7 @@ export async function waitForFonts(project) {
   let timer
   try {
     await Promise.race([
-      (async () => { await document.fonts.ready; for (const font of new Set(['Malgun Gothic', 'Georgia', ...project.design.elements.filter(e => e.type === 'text').map(e => e.fontFamily)])) await document.fonts.load(`24px "${font}"`) })(),
+      (async () => { await document.fonts.ready; for (const font of new Set(['Malgun Gothic', 'Georgia', ...project.design.elements.filter(e => e.type === 'text').map(e => e.fontFamily), ...(FONT_FAMILIES.includes(project.design.scheduleSettings?.fontFamily) ? [project.design.scheduleSettings.fontFamily] : [])])) await document.fonts.load(`24px "${font}"`, '한글 ABC 0123') })(),
       new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('폰트 로딩 시간이 초과되었습니다. 다시 내보내 주세요.')), 12000) })
     ])
   } catch (error) { throw new Error(`폰트를 준비하지 못했습니다. ${error.message}`) }

@@ -4,7 +4,18 @@ export const HEIGHT = 1080
 export const DAYS = ['월', '화', '수', '목', '금', '토', '일']
 export const LIMITS = { events: 6, title: 240, description: 300, elements: 100, weeks: 520, assetBytes: 15 * 1024 * 1024, archiveBytes: 120 * 1024 * 1024, manifestBytes: 3 * 1024 * 1024, exportPixels: 96 * 1024 * 1024 }
 export const GEOMETRY = { position: 100000, minSize: 1, maxSize: 32768, rotation: 360 }
-export const SCHEDULE_DEFAULTS = { columns: 0, showDescriptions: true, allowSummary: false }
+export const FONT_OPTIONS = [
+  { value: 'Malgun Gothic', label: '맑은 고딕' },
+  { value: 'Batang', label: '바탕' },
+  { value: 'Dotum', label: '돋움' },
+  { value: 'Gulim', label: '굴림' },
+  { value: 'Gungsuh', label: '궁서' },
+  { value: 'Georgia', label: 'Georgia' },
+  { value: 'Segoe UI', label: 'Segoe UI' },
+  { value: 'Arial', label: 'Arial' }
+]
+export const FONT_FAMILIES = FONT_OPTIONS.map(option => option.value)
+export const SCHEDULE_DEFAULTS = { columns: 0, showDescriptions: true, allowSummary: false, fontFamily: 'template' }
 export const uid = () => crypto.randomUUID()
 export const clone = value => JSON.parse(JSON.stringify(value))
 export function dateKey(date) {
@@ -117,12 +128,12 @@ export function validateProject(raw) {
     if (!e || !['text', 'image', 'schedule'].includes(e.type) || !/^[a-zA-Z0-9-]{1,100}$/.test(e.id) || ids.has(e.id)) throw new Error('디자인 요소 형식이 올바르지 않습니다.')
     ids.add(e.id)
     const base = { id: str(e.id, 100), type: e.type, name: str(e.name, 80), ...normalizeGeometry(e), locked: !!e.locked, visible: e.visible !== false }
-    if (e.type === 'text') Object.assign(base, { text: str(e.text, 2000), fontFamily: ['Georgia', 'Malgun Gothic', 'Segoe UI', 'Arial'].includes(e.fontFamily) ? e.fontFamily : 'Malgun Gothic', fontSize: finite(e.fontSize, 6, 300, 36), fill: color(e.fill), align: ['left', 'center', 'right'].includes(e.align) ? e.align : 'left', bold: !!e.bold })
+    if (e.type === 'text') Object.assign(base, { text: str(e.text, 2000), fontFamily: FONT_FAMILIES.includes(e.fontFamily) ? e.fontFamily : 'Malgun Gothic', fontSize: finite(e.fontSize, 6, 300, 36), fill: color(e.fill), align: ['left', 'center', 'right'].includes(e.align) ? e.align : 'left', bold: !!e.bold })
     if (e.type === 'image') { if (!/^[a-zA-Z0-9-]{1,100}$/.test(e.assetId)) throw new Error('이미지 연결 정보가 잘못되었습니다.'); base.assetId = e.assetId; base.keepRatio = e.keepRatio !== false; base.cropMode=e.cropMode==='cover'?'cover':'contain';base.cropX=finite(e.cropX,0,1,.5);base.cropY=finite(e.cropY,0,1,.5) }
     return base
   })
   const settings = raw.design.scheduleSettings || {}
-  return { id: typeof raw.id === 'string' ? str(raw.id, 100) : uid(), schemaVersion: SCHEMA_VERSION, name: str(raw.name, 80) || '시현의 주간 스케줄', activeWeek: raw.activeWeek, weeks, design: { templateId: raw.design.templateId, elements, scheduleSettings: { columns: [0,1,2,3].includes(settings.columns) ? settings.columns : 0, showDescriptions: settings.showDescriptions !== false, allowSummary: !!settings.allowSummary } }, updatedAt: Number(raw.updatedAt) || Date.now() }
+  return { id: typeof raw.id === 'string' ? str(raw.id, 100) : uid(), schemaVersion: SCHEMA_VERSION, name: str(raw.name, 80) || '시현의 주간 스케줄', activeWeek: raw.activeWeek, weeks, design: { templateId: raw.design.templateId, elements, scheduleSettings: { columns: [0,1,2,3].includes(settings.columns) ? settings.columns : 0, showDescriptions: settings.showDescriptions !== false, allowSummary: !!settings.allowSummary, fontFamily: FONT_FAMILIES.includes(settings.fontFamily) ? settings.fontFamily : 'template' } }, updatedAt: Number(raw.updatedAt) || Date.now() }
 }
 export function scheduleLayout(days, width = 1280, height = 630, settings = SCHEDULE_DEFAULTS) {
   const weights = days.map(day => !day.events.length ? .35 : Math.min(5, Math.ceil(day.events.length / 3) + Math.max(...day.events.map(e => (e.title?.length || 0) / 120 + (e.description?.length || 0) / 240))))

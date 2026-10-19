@@ -38,6 +38,7 @@
 .rail-backup-actions { display: grid; gap: 4px; justify-items: center; }
 .rail-guide-button { width: 54px; min-height: 44px; flex-direction: column; gap: 5px; border-radius: 8px; color: #b9a4ba; font-size: 9px; }
 .help-backup-guide { margin-top: 12px; }
+.schedule-font-note { margin-bottom: 0; }
 .backup-guide-modal { width: min(760px, calc(100vw - 50px)); }
 .backup-guide-content h2 { margin-top: 9px; }
 .backup-guide-intro { color: #c6b4ca; font-size: 12px; line-height: 1.8; }

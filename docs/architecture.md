@@ -1,5 +1,7 @@
 # SIHYEON STUDIO architecture
 
+일정표 폰트는 `design.scheduleSettings.fontFamily`에 저장합니다. `template`은 기존 날짜/본문의 글꼴 조합을 유지하고, 지정된 글꼴은 일정표 안의 요일·날짜·시간·제목·설명에 함께 적용합니다. 일정 원문에는 디자인 정보를 중복 저장하지 않습니다. 동일한 렌더러와 글꼴 준비 과정이 미리보기·썸네일·출력 전 점검·PNG에 적용됩니다. 이전 백업에서 필드가 없으면 `template`으로 보완합니다.
+
 Vue 3 Composition API / JavaScript / Vite. No application server, account, external image URL, or cloud database.
 
 - `stores/project.js`: schema-versioned project, design elements, history, project operations.

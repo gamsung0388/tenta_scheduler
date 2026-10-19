@@ -23,6 +23,25 @@ test('layout settings switch between one and three columns without mutating data
   assert.equal(scheduleLayout(project.weeks[project.activeWeek])[0].eventRows,2);assert.deepEqual(project.weeks,before)
 })
 test('legacy projects receive backward-compatible display settings', () => { const project=createProject();delete project.design.scheduleSettings;assert.deepEqual(validateProject(project).design.scheduleSettings,SCHEDULE_DEFAULTS) })
+
+test('schedule font selection survives validation without duplicating or changing event data', () => {
+  const project=createProject();project.weeks[project.activeWeek][0].events.push({...newEvent(),title:'한글 방송 제목',description:'저장할 원문'})
+  const weeks=clone(project.weeks)
+  for(const fontFamily of ['Malgun Gothic','Batang','Dotum','Gulim','Gungsuh','Georgia','Segoe UI','Arial']) {
+    project.design.scheduleSettings.fontFamily=fontFamily
+    const restored=validateProject(JSON.parse(JSON.stringify(project)))
+    assert.equal(restored.design.scheduleSettings.fontFamily,fontFamily);assert.deepEqual(restored.weeks,weeks)
+  }
+})
+
+test('older or unsupported schedule fonts retain the template appearance', () => {
+  const project=createProject();delete project.design.scheduleSettings.fontFamily
+  assert.equal(validateProject(project).design.scheduleSettings.fontFamily,'template')
+  project.design.scheduleSettings.fontFamily='unsupported-font'
+  assert.equal(validateProject(project).design.scheduleSettings.fontFamily,'template')
+  project.design.scheduleSettings.fontFamily='Gungsuh';project.design.elements[1].fontFamily='Batang'
+  const restored=validateProject(project);assert.equal(restored.design.elements[1].fontFamily,'Batang');assert.equal(restored.design.scheduleSettings.fontFamily,'Gungsuh')
+})
 test('overnight broadcast end time is distinguished from same-day end', () => { assert.equal(isOvernight({start:'21:00',end:'01:00'}),true);assert.equal(isOvernight({start:'20:00',end:'22:00'}),false);assert.equal(isOvernight({start:'20:00',end:''}),false) })
 test('patch history reverses object additions, removals and array changes', () => {
   const before=createProject(),after=clone(before);after.weeks[after.activeWeek][0].events.push(newEvent());after.design.elements.splice(1,1);after.weeks['2026-12-28']=[]
