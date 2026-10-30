@@ -22,9 +22,9 @@ test('quick content appends independent events to the selected day, handles day 
   await page.locator('.canvas-toolbar').click();await page.keyboard.press('Control+z');await expect(quick(page,'노래뱅')).toBeEnabled()
   await page.keyboard.press('Control+Shift+z');await expect(quick(page,'노래뱅')).toBeDisabled()
   await page.locator('.day-strip button').nth(1).click();await page.getByLabel('간편 입력 시작 시간',{exact:true}).fill('')
-  await quick(page,'예열 소통').click();project=await data(page)
+  await quick(page,'노래뱅').click();project=await data(page)
   expect(project.weeks[project.activeWeek][0].events).toHaveLength(6)
-  expect(project.weeks[project.activeWeek][1].events[0]).toMatchObject({title:'예열 소통',start:''})
+  expect(project.weeks[project.activeWeek][1].events[0]).toMatchObject({title:'노래뱅',start:''})
 })
 
 test('personal content persists and is included in a project backup with undoable removal',async({page})=>{

@@ -7,8 +7,6 @@ export const BUILT_IN_CONTENT = [
   ['andutten', '안듣텐'],
   ['tenhaejwo', '텐해줘'],
   ['cinety', '시네티'],
-  ['warmup', '예열 소통'],
-  ['aftertalk', '후열 소통'],
   ['singing', '노래뱅'],
   ['worldcup', '월드컵'],
   ['games', '종합게임'],
