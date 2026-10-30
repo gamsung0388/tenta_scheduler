@@ -8,7 +8,7 @@
 
 [gamsung0388/tenta_scheduler](https://github.com/gamsung0388/tenta_scheduler)
 
-프로젝트 파일은 저장소 루트에 있습니다. `outputs/sihyeon-studio` 같은 하위 경로를 Root directory로 지정하지 않습니다. Node 버전은 `.node-version`과 `.nvmrc`의 `24.11.1`로 고정했습니다.
+프로젝트 파일은 저장소 루트에 있습니다. `outputs/sihyeon-studio` 같은 하위 경로를 Root directory로 지정하지 않습니다. v1.2.0부터 Node 버전은 `.node-version`과 `.nvmrc`의 `24.22.1`로 고정했습니다. 기존에 `NODE_VERSION` 환경 변수를 직접 지정했다면 같은 버전으로 맞춥니다.
 
 ## 2. Cloudflare에서 프로젝트 연결
 
@@ -26,7 +26,7 @@
 | Build command | `npm run build` |
 | Build output directory | `dist` |
 | Root directory | 비워 두기: 저장소 루트 |
-| 환경 변수 | 필요 시 `NODE_VERSION` = `24.11.1` |
+| 환경 변수 | 필요 시 `NODE_VERSION` = `24.22.1` |
 | 앱 비밀키 / API 토큰 | 현재 버전에는 없음 |
 
 6. **Save and Deploy**를 선택합니다. 의존성 설치 → Vite 빌드 → dist 업로드가 끝나면 Cloudflare가 실제 접속 URL을 제공합니다. 표시된 URL을 사용하세요.
@@ -72,7 +72,7 @@ git push origin main
 | --- | --- |
 | 저장소가 보이지 않음 | Cloudflare GitHub 앱의 저장소 접근 권한 |
 | Production branch가 비어 있음 | main에 첫 커밋이 push되었는지 확인 |
-| npm 또는 Vite 빌드 오류 | Node 24.11.1, package-lock.json, 저장소 루트 설정과 빌드 로그 |
+| npm 또는 Vite 빌드 오류 | Node 24.22.1, package-lock.json, 저장소 루트 설정과 빌드 로그 |
 | dist를 찾을 수 없음 | Build command=`npm run build`, output=`dist` 확인 |
 | 화면이나 이미지가 로딩되지 않음 | 빌드 로그 및 배포 파일의 references 폴더; 강력 새로고침 후 확인 |
 | 로컬에서 쓰던 일정이 보이지 않음 | 기존 주소에서 `.tssproj` 백업을 받아 새 주소에서 복원 |

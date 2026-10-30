@@ -2,7 +2,7 @@ export const SCHEMA_VERSION = 1
 export const WIDTH = 1920
 export const HEIGHT = 1080
 export const DAYS = ['월', '화', '수', '목', '금', '토', '일']
-export const LIMITS = { events: 6, title: 240, description: 300, elements: 100, weeks: 520, assetBytes: 15 * 1024 * 1024, archiveBytes: 120 * 1024 * 1024, manifestBytes: 3 * 1024 * 1024, exportPixels: 96 * 1024 * 1024 }
+export const LIMITS = { events: 6, title: 240, description: 300, contentPresets: 24, elements: 100, weeks: 520, assetBytes: 15 * 1024 * 1024, archiveBytes: 120 * 1024 * 1024, manifestBytes: 3 * 1024 * 1024, exportPixels: 96 * 1024 * 1024 }
 export const GEOMETRY = { position: 100000, minSize: 1, maxSize: 32768, rotation: 360 }
 export const FONT_OPTIONS = [
   { value: 'Malgun Gothic', label: '맑은 고딕' },
@@ -55,7 +55,7 @@ export function defaultElements(template = 'academy') {
 }
 export function createProject(now = new Date()) {
   const start = monday(now)
-  return { id: uid(), schemaVersion: SCHEMA_VERSION, name: '시현의 주간 스케줄', activeWeek: start, weeks: { [start]: emptyWeek(start) }, design: { templateId: 'academy', scheduleSettings: { ...SCHEDULE_DEFAULTS }, elements: defaultElements() }, updatedAt: Date.now() }
+  return { id: uid(), schemaVersion: SCHEMA_VERSION, name: '시현의 주간 스케줄', activeWeek: start, weeks: { [start]: emptyWeek(start) }, contentPresets: [], design: { templateId: 'academy', scheduleSettings: { ...SCHEDULE_DEFAULTS }, elements: defaultElements() }, updatedAt: Date.now() }
 }
 export function changeTemplate(project, templateId) {
   if (!THEMES[templateId]) return
@@ -122,6 +122,14 @@ export function validateProject(raw) {
     })
   }
   if (!weeks[raw.activeWeek]) throw new Error('선택된 주간 데이터가 없습니다.')
+  const rawPresets = raw.contentPresets ?? []
+  if (!Array.isArray(rawPresets) || rawPresets.length > LIMITS.contentPresets) throw new Error('내 콘텐츠 목록이 손상되었거나 24개를 초과합니다.')
+  const presetIds = new Set()
+  const contentPresets = rawPresets.map(preset => {
+    if (!preset || typeof preset.id !== 'string' || !/^[a-zA-Z0-9-]{1,100}$/.test(preset.id) || presetIds.has(preset.id) || !['broadcast', 'off', 'tbd'].includes(preset.status) || typeof preset.title !== 'string' || !preset.title.trim()) throw new Error('내 콘텐츠 항목이 올바르지 않습니다.')
+    presetIds.add(preset.id)
+    return { id: preset.id, label: str(preset.label, 32) || str(preset.title, 32), title: str(preset.title, LIMITS.title), description: str(preset.description, LIMITS.description), status: preset.status }
+  })
   if (!Array.isArray(raw.design.elements) || raw.design.elements.length > 100) throw new Error('디자인 요소가 손상되었거나 100개를 초과합니다.')
   const ids = new Set()
   const elements = raw.design.elements.map(e => {
@@ -133,7 +141,7 @@ export function validateProject(raw) {
     return base
   })
   const settings = raw.design.scheduleSettings || {}
-  return { id: typeof raw.id === 'string' ? str(raw.id, 100) : uid(), schemaVersion: SCHEMA_VERSION, name: str(raw.name, 80) || '시현의 주간 스케줄', activeWeek: raw.activeWeek, weeks, design: { templateId: raw.design.templateId, elements, scheduleSettings: { columns: [0,1,2,3].includes(settings.columns) ? settings.columns : 0, showDescriptions: settings.showDescriptions !== false, allowSummary: !!settings.allowSummary, fontFamily: FONT_FAMILIES.includes(settings.fontFamily) ? settings.fontFamily : 'template' } }, updatedAt: Number(raw.updatedAt) || Date.now() }
+  return { id: typeof raw.id === 'string' ? str(raw.id, 100) : uid(), schemaVersion: SCHEMA_VERSION, name: str(raw.name, 80) || '시현의 주간 스케줄', activeWeek: raw.activeWeek, weeks, contentPresets, design: { templateId: raw.design.templateId, elements, scheduleSettings: { columns: [0,1,2,3].includes(settings.columns) ? settings.columns : 0, showDescriptions: settings.showDescriptions !== false, allowSummary: !!settings.allowSummary, fontFamily: FONT_FAMILIES.includes(settings.fontFamily) ? settings.fontFamily : 'template' } }, updatedAt: Number(raw.updatedAt) || Date.now() }
 }
 export function scheduleLayout(days, width = 1280, height = 630, settings = SCHEDULE_DEFAULTS) {
   const weights = days.map(day => !day.events.length ? .35 : Math.min(5, Math.ceil(day.events.length / 3) + Math.max(...day.events.map(e => (e.title?.length || 0) / 120 + (e.description?.length || 0) / 240))))

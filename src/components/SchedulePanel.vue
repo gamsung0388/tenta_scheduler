@@ -4,9 +4,15 @@ import { useScheduleStore } from '../stores/schedule'
 import { useEditorStore } from '../stores/editor'
 import { DAYS, shortDate, LIMITS, isOvernight } from '../lib/model'
 import Icon from './Icon.vue'
+import QuickContent from './QuickContent.vue'
 const project = useProjectStore(), schedule = useScheduleStore()
 const editor = useEditorStore()
 function paste() { if (!schedule.pasteDay()) editor.notify('하루 최대 6개까지 등록할 수 있어요.','error') }
+function saveContent(event) {
+  const result = schedule.saveContent(event)
+  const messages = { saved: '내 콘텐츠에 저장했어요. 이 프로젝트의 백업에도 함께 담겨요.', duplicate: '이미 같은 콘텐츠가 저장되어 있어요.', empty: '먼저 방송 제목을 입력해 주세요.', full: '내 콘텐츠는 프로젝트마다 24개까지 저장할 수 있어요.' }
+  editor.notify(messages[result], result === 'saved' ? 'success' : 'error')
+}
 const emit = defineEmits(['week'])
 const statuses = [{ id: 'broadcast', label: '방송' }, { id: 'off', label: '휴방' }, { id: 'tbd', label: '미정' }]
 </script>
@@ -16,6 +22,7 @@ const statuses = [{ id: 'broadcast', label: '방송' }, { id: 'off', label: '휴
   <div class="day-strip"><button v-for="(day, i) in schedule.days" :key="day.date" :class="{ active: schedule.selectedDay === i, weekend: i > 4 }" :aria-label="`${DAYS[i]}요일 ${day.date}`" :aria-pressed="schedule.selectedDay === i" @click="schedule.selectedDay = i"><span>{{ DAYS[i] }}</span><strong>{{ Number(day.date.slice(-2)) }}</strong><i :class="{ filled: day.events.length }"></i></button></div>
   <div class="day-heading"><h3>{{ shortDate(schedule.day.date) }} <span>{{ DAYS[schedule.selectedDay] }}요일</span></h3><span>{{ schedule.day.events.length }}개의 일정</span></div>
   <div class="day-copy"><button class="quiet-button" :disabled="!schedule.day.events.length" @click="schedule.copyDay(); editor.notify('하루 일정을 복사했어요. 다른 요일에 붙여넣어 보세요.')"><Icon name="copy" :size="13" />하루 복사</button><button class="quiet-button" :disabled="!schedule.clipboard?.length" @click="paste">붙여넣기 · 추가</button></div>
+  <QuickContent />
   <div v-if="!schedule.day.events.length" class="empty-day"><div class="empty-icon"><Icon name="calendar" :size="24" /></div><strong>아직 정해진 일정이 없어요</strong><p>방송이나 쉬어가는 날을 기록해 보세요.<br>변경 사항은 캔버스에 바로 반영돼요.</p></div>
   <article v-for="(event, i) in schedule.day.events" :key="event.id" class="event-card" :data-testid="`event-${i}`">
     <div class="event-top"><span><i :class="event.status"></i> 일정 {{ String(i + 1).padStart(2, '0') }}</span><div class="event-tools"><button class="icon-button subtle" aria-label="일정 위로" :disabled="i===0" @click="schedule.reorder(event.id,-1)"><Icon name="up" :size="13" /></button><button class="icon-button subtle" aria-label="일정 아래로" :disabled="i===schedule.day.events.length-1" @click="schedule.reorder(event.id,1)"><Icon name="lower" :size="13" /></button><button class="icon-button subtle" aria-label="일정 복제" :disabled="schedule.day.events.length>=LIMITS.events" @click="schedule.duplicate(event.id)"><Icon name="copy" :size="13" /></button><button class="icon-button subtle danger" title="일정 삭제" aria-label="일정 삭제" @click="schedule.remove(event.id)"><Icon name="trash" :size="15" /></button></div></div>
@@ -24,6 +31,7 @@ const statuses = [{ id: 'broadcast', label: '방송' }, { id: 'off', label: '휴
     <div v-if="event.status === 'broadcast'" class="field-row"><label class="field"><span>시작 시간</span><input type="time" aria-label="시작 시간" :value="event.start" @input="schedule.update(event.id, { start: $event.target.value })" /></label><label class="field"><span>종료 시간 <small>선택</small></span><input type="time" aria-label="종료 시간" :value="event.end" @input="schedule.update(event.id, { end: $event.target.value })" /></label></div>
     <p v-if="event.status==='broadcast'&&isOvernight(event)" class="overnight-note">종료 시간은 다음 날 (+1일)로 표시돼요.</p>
     <label class="field"><span>설명 <small>선택</small></span><textarea rows="2" :maxlength="LIMITS.description" :value="event.description" placeholder="게임 이름, 함께하는 사람, 짧은 한마디" aria-label="일정 설명" @input="schedule.update(event.id, { description: $event.target.value })"></textarea></label>
+    <button class="quiet-button wide save-content-button" :aria-label="`일정 ${i + 1} 내 콘텐츠로 저장`" :disabled="!event.title.trim()" @click="saveContent(event)"><Icon name="archive" :size="13" />내 콘텐츠로 저장<Icon name="plus" :size="12" /></button>
   </article>
   <button class="add-event" :disabled="schedule.day.events.length >= LIMITS.events" @click="schedule.add()"><Icon name="plus" :size="17" /> {{ schedule.day.events.length >= LIMITS.events ? '하루 최대 6개까지 등록할 수 있어요' : '일정 추가' }}</button>
   <div class="panel-note"><Icon name="lock" :size="15" /><p>일정 편집 중에는 디자인이 고정돼요.<br>마음 편히 이번 주를 채워보세요.</p></div>
